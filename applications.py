@@ -3,7 +3,7 @@ import os
 from google import genai
 from google.genai import types
 import requests
-
+import datetime
 load_dotenv()
 
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -80,3 +80,32 @@ def news_summarizer(url):
     )
     return response.text
 
+def get_forcasted_weather(city:str):
+    """
+    LLM tool that fetches the forecasted weather and tourist places to visit in the city.
+    args:
+    city(str):city name (e.g. Delhi, Dehradun)
+    """
+    try:
+
+
+        response = client.models.generate_content(
+            model = "gemini-2.5-flash-lite",
+            contents=f"""
+            Provide the detailed weather forecast for {city} on {datetime.date.today()}.
+            Then also list the top recommended places to visit in {city} on the same date.
+            Format the response clearly so it can be used by another planning agent.
+            """,
+            config = types.GenerateContentConfig(
+            tools=[types.Tool(google_search=types.GoogleSearch())]
+        )
+
+        )
+        return response.text
+    
+    except Exception as e:
+        return {"error":str(e)}
+    
+
+abc = get_forcasted_weather("Gurgaon")
+print(abc)
