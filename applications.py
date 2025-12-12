@@ -57,3 +57,26 @@ def temperature_of_city(city:str):
 
     )
     return(response.candidates[0].content.parts[0].text)
+
+
+def get_news(topic:str):
+    """fetches latest news headlines
+    
+    args:
+    topic(str): topic to search news for
+    """
+    try:
+        news_api_key = os.getenv("NEWS_API_KEY")
+        url= f"https://newsapi.org/v2/everything?q={topic}&apiKey={news_api_key}&pageSize=5&sortBy=publishedAt"
+        response = requests.get(url)
+        return response.json().get("articles",[])
+    except requests.exceptions.RequestException as e:
+        return {"error":str(e)}
+    
+def news_summarizer(url):
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=f"summarize news from the url:- {url}, dont add sentences like from where the articles is ,in this article etc. Just give clear and crisp summary.",
+    )
+    return response.text
+
